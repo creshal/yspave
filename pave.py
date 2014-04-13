@@ -23,3 +23,6 @@ metadate_complexity = 0.01
 #scrypt maxtime for passwords
 password_complexity = 2.0
 
+#scrypt maxmem = complexity*factor
+memory_factor = 32*1024*1024
+
