@@ -1,7 +1,8 @@
 from Crypto.Hash import SHA256 as hashfn
 from scrypt import encrypt, decrypt
 from json import dumps,loads
-import binascii, os, pave, Crypto.Random, base64,time,sys
+from . import pave
+import binascii, os, Crypto.Random, base64,time,sys
 
 BLKSIZE=32
 

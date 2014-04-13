@@ -1,0 +1,9 @@
+#! /usr/bin/env python
+import argparse
+from yspave.crypto import PaveDB
+from yspave import pave
+
+parser = argparse.ArgumentParser(prog=pave.appname,description="scrypt based CLI password manager")
+parser.add_argument('--version', '-v', action='version', version='%(prog)s '+pave.appvers)
+parser.add_argument('--keyfile', '-k', desc='Read the key from the specified binary file.')
+
