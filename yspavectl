@@ -1,9 +1,79 @@
 #! /usr/bin/env python
-import argparse
-from yspave.crypto import PaveDB
-from yspave import pave
+import argparse,getpass,sys, readline
+from yspave import pave, crypto, util, pwgen
+from colorama import Fore as fg
 
-parser = argparse.ArgumentParser(prog=pave.appname,description="scrypt based CLI password manager")
+actions = '''scrypt based password manager.
+
+Actions:
+	new	Prompts for title/description and generates a new password
+		with supplied entropy (default: %i bit)
+	add	Prompts for title, description and password
+	edit	Edits entry with supplied query ID
+	del	Deletes entry with supplied query ID
+	get	Searches the DB for the supplied query string
+	pwgen	Generate a random password with supplied entropy and print it
+			(default: %i bit)
+
+Password generator options:
+	x, xkcd		Random word generator as per XKCD 936
+	a, alnum	Random letters/numbers
+	p, print	Random characters (letters, digits, punctuation)
+
+'''%(pave.password_bits,pave.password_bits)
+examples = '''Examples:
+	yspavectl pwgen 192
+		Generates a random alphanumeric password and prints it
+
+	yspavectl -m x pwgen
+		Generates a random "sentence"
+
+	yspavectl get foobar
+		Shows all passwords matching "foobar" in their
+		description or title
+
+	yspavectl new
+		Generates a new password and saves it together with
+		supplied metadata
+
+	yspavectl edit 3
+		Edit the password with ID #3
+'''
+
+parser = argparse.ArgumentParser(prog=pave.appname,description=actions,formatter_class=argparse.RawTextHelpFormatter,epilog=examples)
 parser.add_argument('--version', '-v', action='version', version='%(prog)s '+pave.appvers)
-parser.add_argument('--keyfile', '-k', desc='Read the key from the specified binary file.')
+parser.add_argument('--file','-f', help='Database file',nargs='?',default=pave.db_filename)
+parser.add_argument('--config-file','-c',help='Configuration file',nargs='?',default=pave.config_filename)
+parser.add_argument('--pwgen-mode','-m',choices=['print','p','alnum','a','xkcd','x'],default='a',nargs='?')
+parser.add_argument('action', choices=['new','add','edit','del','get','pwgen'], default='get',nargs='?')
+parser.add_argument('query',default=None,nargs='?',help='ID for edit/del mode, search string for get mode')
+args = parser.parse_args()
+
+if args.config_file != pave.config_filename:
+	raise NotImplementedError ('Config file support not yet implemented.')
+
+if args.action == 'pwgen':
+	print (pwgen.new (args.query, args.pwgen_mode))
+	sys.exit (0)
+
+password = getpass.getpass ()
+db = crypto.PaveDB (password, args.file)
+del (password)
+
+if args.action in ['new','add']:
+	title, desc = util.prompt ('Title: '), util.prompt ('Description: ')
+	pw = pwgen.new (args.query, args.pwgen_mode) if args.action == 'new' else getpass.getpass()
+	db.additem (title, pw, desc)
+	if args.action=='new': print ('Generated password: '+fg.YELLOW+pw+fg.RESET)
+	db.syncdb()
+	sys.exit (0)
+
+if args.action == 'edit':
+	raise NotImplementedError ()
+
+if args.action == 'del':
+	raise NotImplementedError ()
+
+if args.action == 'get':
+	raise NotImplementedError ()
 
