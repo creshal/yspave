@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-import argparse,getpass,sys, readline
+import argparse,getpass,sys, readline,os, csv
 from yspave import pave, crypto, util, pwgen
 from colorama import Fore as fg
 
@@ -20,7 +20,7 @@ Password generator options:
 	a, alnum	Random letters/numbers
 	p, print	Random characters (letters, digits, punctuation)
 
-'''%(pave.password_bits,pave.password_bits)
+'''%(pave.PaveCfg.pwgen_bits,pave.PaveCfg.pwgen_bits)
 examples = '''Examples:
 	yspavectl pwgen 192
 		Generates a random alphanumeric password and prints it
@@ -45,34 +45,72 @@ parser.add_argument('--version', '-v', action='version', version='%(prog)s '+pav
 parser.add_argument('--file','-f', help='Database file',nargs='?',default=pave.db_filename)
 parser.add_argument('--config-file','-c',help='Configuration file',nargs='?',default=pave.config_filename)
 parser.add_argument('--pwgen-mode','-m',choices=['print','p','alnum','a','xkcd','x'],default='a',nargs='?')
-parser.add_argument('action', choices=['new','add','edit','del','get','pwgen'], default='get',nargs='?')
+parser.add_argument('action', choices=['new','add','edit','del','get','pwgen','import'], default='get',nargs='?')
 parser.add_argument('query',default=None,nargs='?',help='ID for edit/del mode, search string for get mode')
 args = parser.parse_args()
 
-config = pave.PaveCfg (args.config_file)
+if os.path.exists (args.config_file):
+	config = pave.PaveCfg (args.config_file, args.pwgen_mode)
+else:
+	if args.config_file == pave.config_filename:
+		config = pave.PaveCfg (None, args.pwgen_mode)
+	else: raise IOError ('Config file %s does not exist!'%args.config_file)
+gen = pwgen.PwGen (config)
 
 if args.action == 'pwgen':
-	print (pwgen.new (args.query, args.pwgen_mode))
+	print (gen.mkpass (args.query))
 	sys.exit (0)
 
 password = getpass.getpass ('Database password: ')
-db = crypto.PaveDB (password, args.file)
+db = crypto.PaveDB (password, args.file, config)
 del (password)
 
 if args.action in ['new','add']:
 	title, desc = util.prompt ('Title: '), util.prompt ('Description: ')
-	pw = pwgen.new (args.query, args.pwgen_mode) if args.action == 'new' else getpass.getpass()
+	pw = gen.mkpass (args.query) if args.action == 'new' else getpass.getpass()
 	db.additem (title, pw, desc)
 	if args.action=='new': print ('Generated password: '+fg.YELLOW+pw+fg.RESET)
 	db.syncdb()
-	sys.exit (0)
+
 
 if args.action == 'edit':
-	raise NotImplementedError ()
+	print ('Leave fields blank if you do not want to change them.')
+
+	i = int (query)
+	entry = db.getitem (i)
+	nt = util.prompt ('Title: %s\nNew: '%entry['Title'])
+	if not nt: nt=entry['Title']
+	nd = util.prompt ('Description: %s\nNew: '%entry['Description'])
+
+	pwchoice = util.prompt ('Change password? [(y)es/(N)o/(g)enerate]').upper()
+	if pwchoice == 'y':
+		print ('Password: %s'%db.dec (entry['Password'],db.key))
+		np = getpass.getpass ('New: ')
+	elif pwchoice == 'g':
+		np = gen.mkpass (args.query)
+		print ('Generated password: '+fg.YELLOW+pw+fg.RESET)
+	else:
+		np = db.dec (entry['Password'],db.key)
+
+	db.edititem (i, nt, np, nd)
+	db.syncdb()
+
 
 if args.action == 'del':
-	raise NotImplementedError ()
+	db.delitem (args.query)
+	db.syncdb()
+
 
 if args.action == 'get':
-	raise NotImplementedError ()
+	headings = []
+	headings.append (['ID','Title','Password','Details'])
+	items = sorted (db.finditems (args.query, True), key=lambda x:x[0])
+	headings.extend (items)
+	util.print_table (headings, True)
 
+if args.action == 'import':
+	with open (args.query, newline='') as f:
+		r = csv.DictReader (f, fieldnames=('title','details','password'))
+		for line in r:
+			db.additem (**line)
+	db.syncdb()

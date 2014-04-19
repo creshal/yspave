@@ -10,18 +10,22 @@ class PwGen ():
 		self.dict = config.pwgen_dict
 		self.rng  = config.rng
 
-	def new (self):
+	def entropy_estimate (self, entropy, token_range):
+		return int ((entropy*math.log(2))/math.log(token_range))
+
+	def mkpass (self, entropy=None):
 		if self.mode == 'external':
 			return subprocess.check_output (self.call,shell=True)
 
-		if mode in ['x','xkcd']:
+		entropy=self.bits if not entropy else int(entropy)
+		if self.mode in ['x','xkcd']:
 			raise NotImplementedError ()
-		elif mode in ['p','print']:
-			bytes_needed = int ((self.bits*math.log(2))/math.log(94))
-			return ''.join (map (lambda x: chr(x%94+21), self.rng.read(bytes_needed)))
-		elif mode in ['a','alnum']:
-			lut = string.ascii_letters+string.digits
+		else:
+			if self.mode in ['p','print']:
+				lut = string.ascii_letters+string.digits+string.punctuation
+			elif self.mode in ['a','alnum']:
+				lut = string.ascii_letters+string.digits
 			lutsz = len (lut)
-			bytes_needed = int ((self.bits*math.log(2))/math.log(lutsz))
+			bytes_needed = self.entropy_estimate (entropy, lutsz)
 			return ''.join (map (lambda x: lut[x%lutsz], self.rng.read(bytes_needed)))
 

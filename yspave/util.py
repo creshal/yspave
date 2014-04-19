@@ -1,12 +1,15 @@
+from __future__ import print_function
 from . import pave
-import sys, scrypt, binascii
+from colorama import Fore as fg
+import sys, scrypt, binascii, colorama
 PY2 = sys.version_info < (3, 0, 0, 'final', 0)
 
-def print_table (ls):
+def print_table (ls,pretty=False):
 	c = max (map (len, ls))
 	csz = [max(map(lambda y:len(str(y)), [l[x] for l in ls])) for x in range(c)]
+	if pretty: print (fg.BLUE,end='')
 	for l in ls:
-		print ("".join([str(l[i]).ljust(csz[i]+4) for i in range(c)]).rstrip())
+		print(''.join([str(l[i]).ljust(csz[i]+4)for i in range(c)]).rstrip()+fg.RESET)
 
 def prompt (ps1=''):
 	return raw_input(ps1) if PY2 else input (ps1)
@@ -20,17 +23,4 @@ def s (d):
 def mkhash (data, salt): return tohex (scrypt.hash(s(data), s(salt)))
 def tohex (data):        return binascii.hexlify (data).decode('ascii')
 def fromhex (data):      return binascii.unhexlify (data)
-
-
-if __name__=='__main__':
-	testcase = [
-		["foo"*2, "baz", "basdfdsfdsfdsfdsfds"],
-		["foobarfoo","batbatbat", "asd"]]
-	table = [["", "taste", "land speed", "life"],
-		["spam", 300101, 4, 1003],
-		["eggs", 105, 13, 42],
-		["lumberjacks", 13, 105, 10]]
-	print_table (testcase)
-	print ()
-	print_table (table)
 

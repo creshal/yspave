@@ -22,8 +22,12 @@ class PaveCfg ():
 	pwgen_bits = 64
 	pwgen_dict = '/usr/share/dict/words'
 
-	def __init__ (self, filename):
+	def __init__ (self, filename, override_mode=None):
 		self.rng = Crypto.Random.new()
+		if override_mode:
+			self.pwgen_mode = override_mode
+		if not filename: return
+
 		with open (filename) as f:
 			cfgsettings = yaml.load (f)
 		if 'encryption' in cfgsettings:
@@ -46,7 +50,7 @@ class PaveCfg ():
 
 		if 'pwgen' in cfgsettings:
 			pwcfg = cfgsettings['pwgen']
-			if 'mode' in pwcfg: self.pwgen_mode = pwcfg['mode']
+			if 'mode' in pwcfg and not override_mode: self.pwgen_mode = pwcfg['mode']
 			if self.pwgen_mode not in pwgen.modes:
 				raise ValueError ('Unknown password generation mode: '+self.pwgen_mode)
 			if 'bits' in pwcfg: self.pwgen_bits = int(pwcfg['bits'])
