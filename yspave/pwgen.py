@@ -1,24 +1,27 @@
-import Crypto.Random, subprocess, scrypt, math, string
-from . import pave,util
+import subprocess, math, string
 
-def new (entropy=None,mode=pave.pwgen_mode,call=None):
-	if mode == 'external':
-		return subprocess.check_output (call,shell=True)
+modes = ['external', 'x','xkcd','p','print', 'a','alnum']
 
-	entropy = int (entropy) if entropy and int(entropy)>32 else pave.password_bits
+class PwGen ():
+	def __init__ (self, config):
+		self.bits = config.pwgen_bits
+		self.mode = config.pwgen_mode
+		self.call = config.pwgen_call
+		self.dict = config.pwgen_dict
+		self.rng  = config.rng
 
-	rng = Crypto.Random.new()
+	def new (self):
+		if self.mode == 'external':
+			return subprocess.check_output (self.call,shell=True)
 
-	if mode in ['x','xkcd']:
-		raise NotImplementedError ()
-	elif mode in ['p','print']:
-		bytes_needed = int ((entropy*math.log(2))/math.log(94))
-		return ''.join (map (lambda x: chr(x%94+21), rng.read(bytes_needed)))
-	elif mode in ['a','alnum']:
-		lut = string.ascii_letters+string.digits
-		lutsz = len (lut)
-		bytes_needed = int ((entropy*math.log(2))/math.log(lutsz))
-		return ''.join (map (lambda x: lut[x%lutsz], rng.read(bytes_needed)))
-	else:
-		return util.tohex (util.mkhash (rng.read (pave.password_bits/8),''))
+		if mode in ['x','xkcd']:
+			raise NotImplementedError ()
+		elif mode in ['p','print']:
+			bytes_needed = int ((self.bits*math.log(2))/math.log(94))
+			return ''.join (map (lambda x: chr(x%94+21), self.rng.read(bytes_needed)))
+		elif mode in ['a','alnum']:
+			lut = string.ascii_letters+string.digits
+			lutsz = len (lut)
+			bytes_needed = int ((self.bits*math.log(2))/math.log(lutsz))
+			return ''.join (map (lambda x: lut[x%lutsz], self.rng.read(bytes_needed)))
 

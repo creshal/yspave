@@ -1,0 +1,48 @@
+# vim: set ft=yaml
+{
+  "pwgen": {
+    # built-in modes:
+    # xkcd	Random word generator as per XKCD 936
+    # alnum	Random letters/numbers
+    # print	Random characters (letters, digits, punctuation)
+    # external (see below)
+    "mode": "alnum",
+    # external expects this to be a shell call to an external binary, which
+    # returns a single password in stdin
+    #
+    # ex. (comparable to builtin alnum):
+    #"call": "tr -dc '[:alnum:]' < /dev/urandom | fold -b16 | head -n1",
+    "call": null,
+    # This is the estimated entropy to use for new passwords
+    # 64 bits equal ~12 alnum characters, or ~5 words (depending on dictionary)
+    # 192 bits are ~32 characters, or ~12 words
+    # If you don't plan to memorize passwords, it is recommended to use the
+    # highest strength allowed by the target application.
+    "bits": 192,
+    # xkcd mode needs a dictionary to choose words from
+    # This can be any file that contains one word per line
+    "dict": "/usr/share/dict/words"
+  },
+  "encryption": {
+    # This is the scrypt maxtime setting for metadata – titles/descriptions.
+    # As those are decrypted on the fly while searching for data, you might
+    # want to keep this low for performance reasons (search time = 2*maxtime
+    # per password). Nothing (except your own patience) prevents you from
+    # settings this as high as the password complexity, however.
+    "metadata_complexity": 0.01,
+    # This is the maxtime setting for actual passwords. They're only decrypted
+    # upon match, and thus don't affect performance as much.
+    "password_complexity": 2,
+    # This is factor for the scrypt maxmem setting: maxmem = complexity*factor
+    # i.e., 64M for passwords, with complexity 2 and factor 32M
+    # ex:
+    #"memory_factor": 655360, #640k ought to be enough for everybody, or not
+    #"memory_factor": 1G,
+    #"memory_factor": 4000K,
+    "memory_factor": "64M",
+    # This is the salt length (in byte) for the password-derived keys. Will
+    # only affect newly created databases. As this has neglibile impact on
+    # performance, it can be left at the default.
+    "salt": 32
+  }
+}

@@ -4,17 +4,14 @@ from . import pave
 from .util import *
 import scrypt, os, Crypto.Random, time, sys
 
-
 def enc (data,password,complexity):
 	return tohex (scrypt.encrypt (s (data), s (password), maxtime=complexity, maxmem=int(complexity*pave.memory_factor)))
-
 def dec (data,password):
 	return scrypt.decrypt (fromhex (data), s(password))
 
 
-
 class PaveDB ():
-	def __init__ (self, key, database):
+	def __init__ (self, key, database, config):
 		self.rng = Crypto.Random.new()
 		self.dbfile = database
 
@@ -32,13 +29,18 @@ class PaveDB ():
 				raise Exception ('Unknown database format')
 
 		self.key = mkhash (key, self.db['salt'])
-		if not 'canary' in self.db:
-			self.db['canary']=enc('U'*8, self.key,pave.metadate_complexity)
+		if not 'metakey' in self.db:
+			# As metadata are encrypted with usually lower complexity standards (to
+			# improve overall performance), use a random key for those, not the
+			# same as for passwords. Brute force attacks against metadata are much
+			# more feasible than against passwords, this is intended to prevent
+			# password leaks from metadata attacks.
+			self.db['metakey'] = enc (self.rng.read(pave.saltsize), self.key, pave.password_complexity)
 		else:
-			# scrypt automatically raises an exception on wrong password.
-			# Without this, we'll only get errors when trying to read existing items,
-			# not on inserts, which can potentially corrupt the database
-			dec (self.db['canary'],self.key)
+			# As a side-effect, this forces the entered key to be verified, ensuring
+			# the correct one was supplied before attempting to operate on the actual
+			# database contents.
+			self.key_meta = dec (self.db['metakey'], self.key)
 		del (key)
 
 
@@ -60,17 +62,17 @@ class PaveDB ():
 	def additem (self, title, password, details=''):
 		key = sorted(map (int,self.db['keys']))[-1]+1 if self.db['keys'] else 0
 		value = {
-			'Title': enc (title, self.key, pave.metadate_complexity),
+			'Title': enc (title, self.key_meta, pave.metadate_complexity),
 			'Password': enc (password, self.key, pave.password_complexity),
-			'Details': enc (details, self.key, pave.metadate_complexity)
+			'Details': enc (details, self.key_meta, pave.metadate_complexity)
 		}
 		self.db['keys'][key] = value
 
 
 	def getitem (self, key):
 		return {
-			'Details': dec (self.db['keys'][key]['Details'],self.key),
-			'Title':   dec (self.db['keys'][key]['Title'],self.key),
+			'Details': dec (self.db['keys'][key]['Details'],self.key_meta),
+			'Title':   dec (self.db['keys'][key]['Title'],self.key_meta),
 			'Password':self.db['keys'][key]['Password']
 		}
 
@@ -93,22 +95,22 @@ class PaveDB ():
 #Test suite
 if __name__=='__main__':
 	totaltime = starttime = time.time()
-	testdb = PaveDB (key="foo",database='/tmp/pave.foo.db')
-	print ("Init: %f"%(time.time()-starttime),file=sys.stderr);starttime = time.time()
-	plain = "Attack at dawn"
+	testdb = PaveDB (key='foo',database='/tmp/pave.foo.db')
+	print ('Init: %f'%(time.time()-starttime),file=sys.stderr);starttime = time.time()
+	plain = 'Attack at dawn'
 	cipher = enc (plain,testdb.key,pave.metadate_complexity)
 	assert plain == dec (cipher,testdb.key)
-	print ("1 metadata round: %f"%(time.time()-starttime),file=sys.stderr);starttime = time.time()
-	testdb.additem ("Longtest",plain*1024)
-	testdb.delitem (testdb.finditems("Longtest")[0][0])
-	print ("push pop: %f"%(time.time()-starttime),file=sys.stderr);starttime = time.time()
-	testdb.additem ("Testentry",plain)
-	testdb.additem ("Test2",plain*3,"""Scrypt is useful when encrypting password as it is possible to specify a minimum amount of time to use when encrypting and decrypting. If, for example, a password takes 0.05 seconds to verify, a user won't notice the slight delay when signing in, but doing a brute force search of several billion passwords will take a considerable amount of time. This is in contrast to more traditional hash functions such as MD5 or the SHA family which can be implemented extremely fast on cheap hardware.""")
-	print ("2 push: %f"%(time.time()-starttime),file=sys.stderr);starttime = time.time()
-	print_table (testdb.finditems("Test", decrypt=True))
-	print ("trivial search+decode: %f"%(time.time()-starttime),file=sys.stderr);starttime = time.time()
-	testdb.delitem (testdb.finditems("Test")[0][0])
-	print ("search-pop: %f"%(time.time()-starttime),file=sys.stderr);starttime = time.time()
+	print ('1 metadata round: %f'%(time.time()-starttime),file=sys.stderr);starttime = time.time()
+	testdb.additem ('Longtest',plain*1024)
+	testdb.delitem (testdb.finditems('Longtest')[0][0])
+	print ('push pop: %f'%(time.time()-starttime),file=sys.stderr);starttime = time.time()
+	testdb.additem ('Testentry',plain)
+	testdb.additem ('Test2',plain*3,'''Scrypt is useful when encrypting password as it is possible to specify a minimum amount of time to use when encrypting and decrypting. If, for example, a password takes 0.05 seconds to verify, a user won't notice the slight delay when signing in, but doing a brute force search of several billion passwords will take a considerable amount of time. This is in contrast to more traditional hash functions such as MD5 or the SHA family which can be implemented extremely fast on cheap hardware.''')
+	print ('2 push: %f'%(time.time()-starttime),file=sys.stderr);starttime = time.time()
+	print_table (testdb.finditems('Test', decrypt=True))
+	print ('trivial search+decode: %f'%(time.time()-starttime),file=sys.stderr);starttime = time.time()
+	testdb.delitem (testdb.finditems('Test')[0][0])
+	print ('search-pop: %f'%(time.time()-starttime),file=sys.stderr);starttime = time.time()
 	testdb.syncdb()
-	print ("writeout: %f\ntotal: %s"%(time.time()-starttime, time.time()-totaltime),file=sys.stderr)
+	print ('writeout: %f\ntotal: %s'%(time.time()-starttime, time.time()-totaltime),file=sys.stderr)
 

@@ -49,14 +49,13 @@ parser.add_argument('action', choices=['new','add','edit','del','get','pwgen'], 
 parser.add_argument('query',default=None,nargs='?',help='ID for edit/del mode, search string for get mode')
 args = parser.parse_args()
 
-if args.config_file != pave.config_filename:
-	raise NotImplementedError ('Config file support not yet implemented.')
+config = pave.PaveCfg (args.config_file)
 
 if args.action == 'pwgen':
 	print (pwgen.new (args.query, args.pwgen_mode))
 	sys.exit (0)
 
-password = getpass.getpass ()
+password = getpass.getpass ('Database password: ')
 db = crypto.PaveDB (password, args.file)
 del (password)
 
