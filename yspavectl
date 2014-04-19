@@ -76,13 +76,13 @@ if args.action in ['new','add']:
 if args.action == 'edit':
 	print ('Leave fields blank if you do not want to change them.')
 
-	i = int (query)
-	entry = db.getitem (i)
+	entry = db.getitem (args.query)
 	nt = util.prompt ('Title: %s\nNew: '%entry['Title'])
 	if not nt: nt=entry['Title']
-	nd = util.prompt ('Description: %s\nNew: '%entry['Description'])
+	nd = util.prompt ('Description: %s\nNew: '%entry['Details'])
+	if not nd: nd=entry['Details']
 
-	pwchoice = util.prompt ('Change password? [(y)es/(N)o/(g)enerate]').upper()
+	pwchoice = util.prompt ('Change password? [(y)es/(N)o/(g)enerate]').lower()
 	if pwchoice == 'y':
 		print ('Password: %s'%db.dec (entry['Password'],db.key))
 		np = getpass.getpass ('New: ')
@@ -92,7 +92,7 @@ if args.action == 'edit':
 	else:
 		np = db.dec (entry['Password'],db.key)
 
-	db.edititem (i, nt, np, nd)
+	db.edititem (args.query, nt, np, nd)
 	db.syncdb()
 
 
