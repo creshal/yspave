@@ -1,4 +1,4 @@
-import os.path,xdg.BaseDirectory,yaml,Crypto.Random
+import os.path,xdg.BaseDirectory,json,Crypto.Random
 from . import pwgen
 
 appname = 'yspave'
@@ -29,7 +29,8 @@ class PaveCfg ():
 		if not filename: return
 
 		with open (filename) as f:
-			cfgsettings = yaml.load (f)
+			cfgsettings=json.loads(filter(lambda x:x.strip()[0]!='#',
+			                       f.readlines()))
 		if 'encryption' in cfgsettings:
 			encfg = cfgsettings['encryption']
 			if 'metadata_complexity' in encfg: self.complex_meta = float(encfg['metadata_complexity'])
