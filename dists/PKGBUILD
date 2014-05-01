@@ -1,3 +1,5 @@
+# Maintainer: Samuel Vincent Creshal <samuel@creshal.de>
+_author=creshal
 pkgname=yspave
 pkgver=0.0.2
 pkgrel=1
@@ -5,16 +7,15 @@ pkgdesc='Simple scrypt-based CLI password manager'
 arch=('any')
 url='https://dev.yaki-syndicate.de'
 license=('GPL')
-depends=('python','python-colorama','python-crypto','python-scrypt','python-xdg')
+depends=('python' 'python-colorama' 'python-crypto' 'python-scrypt' 'python-xdg')
 makedepends=('python-setuptools')
-source=('tbd')
-sha512sums=('tbd')
+source=("https://github.com/${_author}/${pkgname}/archive/${pkgver}.tar.gz")
+sha512sums=('64d196d2f1010235eb2fceb36b325a7f9512b7f68e2358ac15cf92e733f9d3cf793c4e5604958196c1413ce1012a1093a91fd1b8b53d8cc89553273823ad2ef8')
 
 build () {
 	cd "${srcdir}/${pkgname}-${pkgver}"
-	make dist
-}
-
-package () {
-	tar -C "${pkgdir}" -xf "${srcdir}/${pkgname}-${pkgver}/dist/*.tar*"
+	python setup.py bdist -d "${pkgdir}"
+	cd "${pkgdir}"
+	tar -xf *.tar*
+	rm *.tar*
 }
