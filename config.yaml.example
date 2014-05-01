@@ -31,7 +31,7 @@
     "metadata_complexity": 0.01,
     # This is the maxtime setting for actual passwords. They're only decrypted
     # upon match, and thus don't affect performance as much.
-    "password_complexity": 2,
+    "password_complexity": 1,
     # This is factor for the scrypt maxmem setting: maxmem = complexity*factor
     # i.e., 64M for passwords, with complexity 2 and factor 32M
     # ex:

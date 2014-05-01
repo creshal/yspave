@@ -8,13 +8,13 @@ default_dir = xdg.BaseDirectory.save_config_path(appname)
 db_filename = os.path.join (default_dir, 'default.db')
 config_filename = os.path.join (default_dir, 'config.yaml')
 
-database_version = 1
+database_version = 2
 database_encoding = 'utf8'
 
 class PaveCfg ():
 	complex_meta = 0.01
-	complex_pass = 2.0
-	mem_factor = 32*1024*1024
+	complex_pass = 1.0
+	mem_factor = 64*1024*1024
 	saltsize = 32
 
 	pwgen_mode = 'print'
