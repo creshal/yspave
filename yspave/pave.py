@@ -6,7 +6,7 @@ appvers = '0.0.2'
 
 default_dir = xdg.BaseDirectory.save_config_path(appname)
 db_filename = os.path.join (default_dir, 'default.db')
-config_filename = os.path.join (default_dir, 'config.yaml')
+config_filename = os.path.join (default_dir, 'config.json')
 
 database_version = 2
 database_encoding = 'utf8'
