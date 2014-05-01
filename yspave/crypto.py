@@ -46,13 +46,14 @@ class PaveDB ():
 	def syncdb (self):
 		umask = False if os.path.exists (self.dbfile) else os.umask (0o7077)
 		with open (self.dbfile,'w') as f:
-			dump ({
+			data = dumps ({
 				'version': pave.database_version,
 				'salt': self.db['salt'],
 				'metakey': self.db['metakey'],
-				'keys': self.enc (json.dumps (self.db['keys']),
+				'keys': self.enc (dumps (self.db['keys']),
 				                  self.key, self.cfg.complex_pass)
-			}, f)
+			})
+			f.write (data)
 		if umask: os.umask (umask)
 
 
