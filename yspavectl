@@ -13,7 +13,11 @@ Actions:
 	del	Deletes entry with supplied query ID
 	get	Searches the DB for the supplied query string
 	pwgen	Generate a random password with supplied entropy and print it
-			(default: %i bit)
+		(default: %i bit)
+	import	Imports passwords from a CSV file.
+		Column order is title, description, password
+		The format is the default Excel/Calc format (comma separation,
+		quoting optional).
 
 Password generator options:
 	x, xkcd		Random word generator as per XKCD 936
@@ -114,3 +118,4 @@ if args.action == 'import':
 		for line in r:
 			db.additem (**line)
 	db.syncdb()
+
