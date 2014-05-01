@@ -1,0 +1,20 @@
+pkgname=yspave
+pkgver=0.0.2
+pkgrel=1
+pkgdesc='Simple scrypt-based CLI password manager'
+arch=('any')
+url='https://dev.yaki-syndicate.de'
+license=('GPL')
+depends=('python','python-colorama','python-crypto','python-scrypt','python-xdg')
+makedepends=('python-setuptools')
+source=('tbd')
+sha512sums=('tbd')
+
+build () {
+	cd "${srcdir}/${pkgname}-${pkgver}"
+	make dist
+}
+
+package () {
+	tar -C "${pkgdir}" -xf "${srcdir}/${pkgname}-${pkgver}/dist/*.tar*"
+}
