@@ -9,30 +9,28 @@ class PaveDB ():
 		self.rng = config.rng
 		self.dbfile = database
 		self.cfg = config
-		nodb = not os.path.exists (self.dbfile)
 
-		if nodb:
+		if not os.path.exists (self.dbfile):
 			print ('Creating new database `%s`...'%self.dbfile)
+			salt=tohex (self.rng.read(self.cfg.saltsize))
+			self.key = mkhash (key, salt)
 			self.db = {
 				'version': pave.database_version,
-				'salt': tohex (self.rng.read(self.cfg.saltsize)),
-				'keys': {}
+				'salt': salt,
+				'keys': {},
+				'metakey': self.enc (tohex(self.rng.read(self.cfg.saltsize)),
+			                       self.key, self.cfg.complex_pass)
 			}
 		else:
 			with open (self.dbfile) as f:
 				self.db = load (f)
 			if not 'version' in self.db or self.db['version'] >pave.database_version:
 				raise Exception ('Unknown database format')
+			self.key = mkhash (key, self.db['salt'])
 			if self.db['version'] == 1:
 				pass
 			if self.db['version'] == 2:
 				self.db['keys'] = loads (self.dec (self.db['keys'], self.key))
-
-		self.key = mkhash (key, self.db['salt'])
-		del (key)
-		if nodb:
-			self.db['metakey'] = self.enc (tohex(self.rng.read(self.cfg.saltsize)),
-			                               self.key, self.cfg.complex_pass)
 		self.key_meta = self.dec (self.db['metakey'], self.key)
 
 
