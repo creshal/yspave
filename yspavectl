@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+# (c) Samuel Vincent Creshal <samuel@creshal.de> 2014
 import argparse,getpass,sys, readline,os, csv
 from yspave import pave, crypto, util, pwgen
 from colorama import Fore as fg
