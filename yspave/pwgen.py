@@ -1,4 +1,5 @@
 import subprocess, math, string
+from Crypto.Random import random
 
 modes = ['external', 'x','xkcd','p','print', 'a','alnum']
 
@@ -11,7 +12,7 @@ class PwGen ():
 		self.rng  = config.rng
 
 	def entropy_estimate (self, entropy, token_range):
-		return int ((entropy*math.log(2))/math.log(token_range))
+		return math.ceil ((entropy*math.log(2))/math.log(token_range))
 
 	def mkpass (self, entropy=None):
 		if self.mode == 'external':
@@ -19,7 +20,9 @@ class PwGen ():
 
 		entropy=self.bits if not entropy else int(entropy)
 		if self.mode in ['x','xkcd']:
-			raise NotImplementedError ()
+			lut = list(set(open(self.dict).read().replace("'s",'').split()))
+			lutsz = len (lut)
+			return ' '.join (random.sample(lut,self.entropy_estimate(entropy,lutsz)))
 		else:
 			if self.mode in ['p','print']:
 				lut = string.ascii_letters+string.digits+string.punctuation
