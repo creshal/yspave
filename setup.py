@@ -6,9 +6,10 @@ setup (
 	version=pave.appvers,
 	install_requires=['scrypt','pycrypto','colorama','pyxdg'],
 	data_files=[
-	 ('/usr/share/doc/yspave',['COPYING','HACKING.md','README.md','config.json.example']),
-	 ('/usr/bin','yspavectl')
+	 ('share/doc/yspave',['COPYING','HACKING.md','README.md','config.json.example']),
+	 ('bin',['yspavectl'])
 	],
+	url='https://dev.yaki-syndicate.de/',
 	packages=['yspave'],
 	description='scrypt based CLI password manager',
 	author='Samuel Vincent Creshal',
