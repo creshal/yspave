@@ -18,6 +18,9 @@ Actions:
 		Column order is title, description, password
 		The format is the default Excel/Calc format (comma separation,
 		quoting optional).
+	migrate	Re-syncs the database, migrating it to new database formats
+		and doing other maintenance if necessary.
+		This is also done automatically on all writing operations (edit/add/del).
 
 Password generator options:
 	x, xkcd		Random word generator as per XKCD 936
@@ -49,7 +52,7 @@ parser.add_argument('--version', '-v', action='version', version='%(prog)s '+pav
 parser.add_argument('--file','-f', help='Database file',nargs='?',default=pave.db_filename)
 parser.add_argument('--config-file','-c',help='Configuration file',nargs='?',default=pave.config_filename)
 parser.add_argument('--pwgen-mode','-m',choices=['print','p','alnum','a','xkcd','x'],default='a',nargs='?')
-parser.add_argument('action', choices=['new','add','edit','del','get','pwgen','import'], default='get',nargs='?')
+parser.add_argument('action', choices=['migrate','new','add','edit','del','get','pwgen','import'], default='get',nargs='?')
 parser.add_argument('query',default=None,nargs='?',help='ID for edit/del mode, search string for get mode')
 args = parser.parse_args()
 
@@ -102,6 +105,10 @@ if args.action == 'edit':
 
 if args.action == 'del':
 	db.delitem (args.query)
+	db.syncdb()
+
+
+if args.action == 'migrate':
 	db.syncdb()
 
 
