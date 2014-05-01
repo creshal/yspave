@@ -1,18 +1,17 @@
 from __future__ import print_function
-from json import dump,load
+from json import dump,load,loads,dumps
 from . import pave
 from .util import *
-import scrypt, os, Crypto.Random, time, sys
-
-
+import scrypt, os
 
 class PaveDB ():
 	def __init__ (self, key, database, config):
 		self.rng = config.rng
 		self.dbfile = database
 		self.cfg = config
+		nodb = not os.path.exists (self.dbfile)
 
-		if not os.path.exists (self.dbfile):
+		if nodb:
 			print ('Creating new database `%s`...'%self.dbfile)
 			self.db = {
 				'version': pave.database_version,
@@ -22,22 +21,18 @@ class PaveDB ():
 		else:
 			with open (self.dbfile) as f:
 				self.db = load (f)
-			if not 'version' in self.db or self.db['version'] > pave.database_version:
+			if not 'version' in self.db or self.db['version'] >pave.database_version:
 				raise Exception ('Unknown database format')
+			if self.db['version'] == 1:
+				pass
+			if self.db['version'] == 2:
+				self.db['keys'] = loads (self.dec (self.db['keys'], self.key))
 
 		self.key = mkhash (key, self.db['salt'])
 		del (key)
-		if not 'metakey' in self.db:
-			# As metadata are encrypted with usually lower complexity standards (to
-			# improve overall performance), use a random key for those, not the
-			# same as for passwords. Brute force attacks against metadata are much
-			# more feasible than against passwords, this is intended to prevent
-			# password leaks from metadata attacks.
+		if nodb:
 			self.db['metakey'] = self.enc (tohex(self.rng.read(self.cfg.saltsize)),
 			                               self.key, self.cfg.complex_pass)
-		# As a side-effect, this forces the entered key to be verified, ensuring
-		# the correct one was supplied before attempting to operate on the actual
-		# database contents.
 		self.key_meta = self.dec (self.db['metakey'], self.key)
 
 
@@ -51,7 +46,13 @@ class PaveDB ():
 	def syncdb (self):
 		umask = False if os.path.exists (self.dbfile) else os.umask (0o7077)
 		with open (self.dbfile,'w') as f:
-			dump (self.db, f)
+			dump ({
+				'version': pave.database_version,
+				'salt': self.db['salt'],
+				'metakey': self.db['metakey'],
+				'keys': self.enc (json.dumps (self.db['keys']),
+				                  self.key, self.cfg.complex_pass)
+			}, f)
 		if umask: os.umask (umask)
 
 
