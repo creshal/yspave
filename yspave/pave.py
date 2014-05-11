@@ -29,8 +29,8 @@ class PaveCfg ():
 		if not filename: return
 
 		with open (filename) as f:
-			cfgsettings=json.loads(filter(lambda x:x.strip()[0]!='#',
-			                       f.readlines()))
+			cfgsettings=json.loads(''.join(filter(lambda x:x.strip()[0]!='#',
+			                       f.readlines())))
 		if 'encryption' in cfgsettings:
 			encfg = cfgsettings['encryption']
 			if 'metadata_complexity' in encfg: self.complex_meta = float(encfg['metadata_complexity'])
