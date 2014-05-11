@@ -1,7 +1,7 @@
 # Maintainer: Samuel Vincent Creshal <samuel@creshal.de>
 _author=creshal
 pkgname=yspave
-pkgver=0.0.2
+pkgver=0.0.3
 pkgrel=1
 pkgdesc='Simple scrypt-based CLI password manager'
 arch=('any')
@@ -10,7 +10,7 @@ license=('GPL')
 depends=('python' 'python-colorama' 'python-crypto' 'python-scrypt' 'python-xdg')
 makedepends=('python-setuptools')
 source=("https://github.com/${_author}/${pkgname}/archive/${pkgver}.tar.gz")
-sha512sums=('64d196d2f1010235eb2fceb36b325a7f9512b7f68e2358ac15cf92e733f9d3cf793c4e5604958196c1413ce1012a1093a91fd1b8b53d8cc89553273823ad2ef8')
+sha512sums=('d27826809375599948561d8b4cfde8ea57e5f9dd454bc432ca4aea4f873ccd3e7a8d19d370f5319ef226d0f0c4f8e4eb0531a766ee9d17d453375a922a05eceb')
 
 build () {
 	cd "${srcdir}/${pkgname}-${pkgver}"
