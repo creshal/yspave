@@ -95,7 +95,7 @@ if args.action == 'edit':
 		print ('Password: %s'%db.dec (entry['Password'],db.key))
 		np = getpass.getpass ('New: ')
 	elif pwchoice == 'g':
-		np = gen.mkpass (args.query)
+		np = gen.mkpass ()
 		print ('Generated password: '+fg.YELLOW+np+fg.RESET)
 	else:
 		np = db.dec (entry['Password'],db.key)
