@@ -1,7 +1,7 @@
 from __future__ import print_function
 from . import pave
 from colorama import Fore as fg
-import sys, scrypt, binascii, colorama
+import sys, scrypt, binascii, colorama, base64
 PY2 = sys.version_info < (3, 0, 0, 'final', 0)
 
 def print_table (ls,pretty=False):
@@ -24,3 +24,5 @@ def mkhash (data, salt): return tohex (scrypt.hash(s(data), s(salt)))
 def tohex (data):        return binascii.hexlify (data).decode('ascii')
 def fromhex (data):      return binascii.unhexlify (data)
 
+def to64 (data):         return base64.b64encode(data)
+def from64 (data):       return base64.b64decode(data)
