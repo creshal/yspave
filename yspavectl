@@ -13,6 +13,7 @@ Actions:
 	edit	Edits entry with supplied query ID
 	del	Deletes entry with supplied query ID
 	get	Searches the DB for the supplied query string
+		Shows the whole database if no query is supplied. This can take a while.
 	pwgen	Generate a random password with supplied entropy and print it
 		(default: %i bit)
 	import	Imports passwords from a CSV file.

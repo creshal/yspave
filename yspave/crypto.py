@@ -83,10 +83,11 @@ class PaveDB ():
 
 	def finditems (self, query, decrypt=False):
 		results = []
-		query = query.upper()
+		if query: query = query.upper()
 		for key in self.db['keys']:
 			x=self.getitem (key)
-			if query in x['Title'].upper() or query in x['Details'].upper():
+			# Empty query ==> print whole database
+			if not query or query in (x['Title'].upper()+x['Details'].upper()):
 				results.append ((
 				 key,
 				 x['Title'],
