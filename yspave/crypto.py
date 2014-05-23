@@ -28,29 +28,38 @@ class PaveDB ():
 				raise Exception ('Unknown database format')
 			self.key = mkhash (key, self.db['salt'])
 			if self.db['version'] == 1:
-				pass
-			if self.db['version'] == 2:
+				print ('Obsolete database version. Migrate as soon as possible.')
+			if self.db['version'] in [2,3]:
 				self.db['keys'] = loads (self.dec (self.db['keys'], self.key))
 		self.key_meta = self.dec (self.db['metakey'], self.key)
 
 
 	def enc (self, data, password,complexity):
-		return tohex (scrypt.encrypt (s (data), s (password),
+		return to64 (scrypt.encrypt (s (data), s (password),
 		        maxtime=complexity, maxmem=int(complexity*self.cfg.mem_factor)))
 	def dec (self, data, password):
-		return scrypt.decrypt (fromhex (data), s(password))
+		if self.db['version'] < 3:
+			return scrypt.decrypt (fromhex (data), s(password))
+		else:
+			return scrypt.decrypt (from64 (data), s(password))
 
 
 	def syncdb (self):
 		umask = False if os.path.exists (self.dbfile) else os.umask (0o7077)
+		if self.db['version'] < 3:
+			#re-encode old hex data as base64
+			for key in self.db['keys']:
+				for prop in self.db['keys'][key]:
+					self.db['keys'][key][prop]=to64(fromhex(self.db['keys'][key][prop]))
+			self.db['metakey']=to64(fromhex(self.db['metakey']))
+		data = dumps ({
+			'version': pave.database_version,
+			'salt': self.db['salt'],
+			'metakey': self.db['metakey'],
+			'keys': self.enc (dumps (self.db['keys']),
+			                  self.key, self.cfg.complex_pass)
+		})
 		with open (self.dbfile,'w') as f:
-			data = dumps ({
-				'version': pave.database_version,
-				'salt': self.db['salt'],
-				'metakey': self.db['metakey'],
-				'keys': self.enc (dumps (self.db['keys']),
-				                  self.key, self.cfg.complex_pass)
-			})
 			f.write (data)
 		if umask: os.umask (umask)
 

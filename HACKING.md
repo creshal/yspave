@@ -25,6 +25,10 @@ way).
 	})
 }</pre>
 
+## Version 3
+Same as version 2, but uses base64 instead of hex encoding, to save a bit of
+space.
+
 # Overall architecture description/rationale
 ## JSON
 Serialization/deserialization happens at most four times per program run

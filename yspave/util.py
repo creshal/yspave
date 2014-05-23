@@ -24,5 +24,5 @@ def mkhash (data, salt): return tohex (scrypt.hash(s(data), s(salt)))
 def tohex (data):        return binascii.hexlify (data).decode('ascii')
 def fromhex (data):      return binascii.unhexlify (data)
 
-def to64 (data):         return base64.b64encode(data)
+def to64 (data):         return base64.b64encode(data).decode('ascii')
 def from64 (data):       return base64.b64decode(data)
