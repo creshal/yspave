@@ -2,7 +2,7 @@ from __future__ import print_function
 from json import dump,load,loads,dumps
 from . import pave
 from .util import *
-import scrypt, os
+import scrypt, os, shutil
 
 class PaveDB ():
 	def __init__ (self, key, database, config):
@@ -59,6 +59,7 @@ class PaveDB ():
 			'keys': self.enc (dumps (self.db['keys']),
 			                  self.key, self.cfg.complex_pass)
 		})
+		shutil.copyfile (self.dbfile,self.dbfile+'~')
 		with open (self.dbfile,'w') as f:
 			f.write (data)
 		if umask: os.umask (umask)
