@@ -2,7 +2,7 @@ import os.path,xdg.BaseDirectory,json,Crypto.Random
 from . import pwgen
 
 appname = 'yspave'
-appvers = '0.0.2'
+appvers = '0.0.4'
 
 default_dir = xdg.BaseDirectory.save_config_path(appname)
 db_filename = os.path.join (default_dir, 'default.db')
