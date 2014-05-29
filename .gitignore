@@ -3,3 +3,5 @@ __pycache__
 *.swo
 *.pyc
 *.pyo
+dists/*.gz
+dists/src/
