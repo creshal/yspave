@@ -78,8 +78,7 @@ while True:
 		break
 	except EOFError:          sys.exit (0)
 	except KeyboardInterrupt: sys.exit (1)
-	except:
-		pass
+	except:pass
 
 cmd = commands.Commands(config, db)
 
@@ -88,5 +87,16 @@ if args.action:
 	cmd.dispatch (args.action, args.query)
 else:
 	#interactive mode
-	pass
+	while True:
+		try:
+			action, query = util.prompt ('> ').split()
+			if not action: raise EOFError
+		except EOFError:          sys.exit (0)
+		except KeyboardInterrupt: sys.exit (1)
+		except ValueError:        pass
+
+		if action in ['help','?']:
+			print (actions+examples)
+		else:
+			cmd.dispatch (action, query)
 

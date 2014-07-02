@@ -18,9 +18,11 @@ class Commands ():
 			self.get (query)
 		elif action == 'edit':
 			self.edit (query)
+		elif action == 'pwgen':
+			print (self.gen.mkpass (query))
 
 		#action == migrate is handled implicitly by this
-		if action != 'get':
+		if action not in ['get','pwgen']:
 			self.db.syncdb()
 
 
