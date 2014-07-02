@@ -11,8 +11,9 @@ def print_table (ls,pretty=False):
 	for l in ls:
 		print(''.join([str(l[i]).ljust(csz[i]+4)for i in range(c)]).rstrip()+fg.RESET)
 
-def prompt (ps1=''):
-	return raw_input(ps1) if PY2 else input (ps1)
+def prompt (ps1='', default=''):
+	i = raw_input(ps1) if PY2 else input (ps1)
+	return i if i else default
 
 def s (d):
 	if (not PY2 and isinstance (d, str))\
