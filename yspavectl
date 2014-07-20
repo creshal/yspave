@@ -89,11 +89,10 @@ else:
 	#interactive mode
 	while True:
 		try:
-			action, query = (util.prompt ('> ')+' ').split(' ',2)
+			action, query = map (lambda x: x.strip(), (util.prompt ('> ')+' ').split(' ',1))
 			if not action: raise EOFError
 		except EOFError:          sys.exit (0)
 		except KeyboardInterrupt: sys.exit (1)
-		except ValueError:        pass
 
 		if action in ['help','?']:
 			print (actions+examples)
