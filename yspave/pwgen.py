@@ -12,7 +12,7 @@ class PwGen ():
 		self.rng  = config.rng
 
 	def entropy_estimate (self, entropy, token_range):
-		return math.ceil ((entropy*math.log(2))/math.log(token_range))
+		return int(math.ceil ((entropy*math.log(2))/math.log(token_range)))
 
 	def mkpass (self, entropy=None):
 		if self.mode == 'external':
@@ -20,7 +20,7 @@ class PwGen ():
 
 		entropy=self.bits if not entropy else int(entropy)
 		if self.mode in ['x','xkcd']:
-			lut = list(set(open(self.dict).read().replace("'s",'').split()))
+			with open (self.dict) as f: lut = list(set(f.read().replace("'s",'').split()))
 			lutsz = len (lut)
 			return ' '.join (random.sample(lut,self.entropy_estimate(entropy,lutsz)))
 		else:
@@ -30,5 +30,5 @@ class PwGen ():
 				lut = string.ascii_letters+string.digits
 			lutsz = len (lut)
 			bytes_needed = self.entropy_estimate (entropy, lutsz)
-			return ''.join (map (lambda x: lut[x%lutsz], self.rng.read(bytes_needed)))
+			return ''.join (map (lambda x: lut[x%lutsz], bytearray(self.rng.read(bytes_needed))))
 

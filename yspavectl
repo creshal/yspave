@@ -89,7 +89,7 @@ else:
 	#interactive mode
 	while True:
 		try:
-			action, query = util.prompt ('> ').split()
+			action, query = (util.prompt ('> ')+' ').split(' ',2)
 			if not action: raise EOFError
 		except EOFError:          sys.exit (0)
 		except KeyboardInterrupt: sys.exit (1)
