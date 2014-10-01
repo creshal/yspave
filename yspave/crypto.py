@@ -59,7 +59,8 @@ class PaveDB ():
 			'keys': self.enc (dumps (self.db['keys']),
 			                  self.key, self.cfg.complex_pass)
 		})
-		shutil.copyfile (self.dbfile,self.dbfile+'~')
+		if os.path.exists (self.dbfile):
+			shutil.copyfile (self.dbfile,self.dbfile+'~')
 		with open (self.dbfile,'w') as f:
 			f.write (data)
 		if umask: os.umask (umask)
