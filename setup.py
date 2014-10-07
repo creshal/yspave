@@ -1,9 +1,9 @@
 from setuptools import setup
-from yspave import pave
+from yspave.metadata import appname, appvers
 
 setup (
-	name=pave.appname,
-	version=pave.appvers,
+	name=appname,
+	version=appvers,
 	install_requires=['scrypt','pycrypto','colorama','pyxdg'],
 	data_files=[
 	 ('share/doc/yspave',['COPYING','HACKING.md','README.md','config.json.example']),
