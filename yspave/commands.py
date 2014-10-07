@@ -47,7 +47,7 @@ class Commands ():
 	def get (self, query, copy = False):
 		items = sorted (self.db.finditems (query, True), key=lambda x:x[0])
 		if not items:
-			print ('No results to query `%s`.' % query)
+			print ('No results for query `%s`.' % query)
 			return
 
 		if copy:
