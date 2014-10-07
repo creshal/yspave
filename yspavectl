@@ -14,6 +14,8 @@ Actions:
 	del	Deletes entry with supplied query ID
 	get	Searches the DB for the supplied query string
 		Shows the whole database if no query is supplied. This can take a while.
+	copy    Same as 'get' but copies the first result to the X CLIPBOARD
+		selection.
 	pwgen	Generate a random password with supplied entropy and print it
 		(default: %i bit)
 	import	Imports passwords from a CSV file.
@@ -54,7 +56,7 @@ parser.add_argument('--version', '-v', action='version', version='%(prog)s '+pav
 parser.add_argument('--file','-f', help='Database file',nargs='?',default=pave.db_filename)
 parser.add_argument('--config-file','-c',help='Configuration file',nargs='?',default=pave.config_filename)
 parser.add_argument('--pwgen-mode','-m',choices=['print','p','alnum','a','xkcd','x'],default='a',nargs='?')
-parser.add_argument('action', choices=['migrate','new','add','edit','del','get','pwgen','import'], default=None,nargs='?')
+parser.add_argument('action', choices=['migrate','new','add','edit','del','get','copy','pwgen','import'], default=None,nargs='?')
 parser.add_argument('query',default=None,nargs='?',help='ID for edit/del mode, search string for get mode')
 args = parser.parse_args()
 

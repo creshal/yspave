@@ -1,6 +1,6 @@
 from . import pwgen, util
 from colorama import Fore as fg
-import getpass, readline, csv
+import getpass, readline, csv, subprocess
 
 class Commands ():
 	def __init__ (self, config, db):
@@ -8,14 +8,14 @@ class Commands ():
 		self.db  = db
 
 	def dispatch (self, action, query):
-		if action in ['new','add']:
+		if action in ('new','add'):
 			self.add (query, action == 'new')
 		elif action == 'del':
 			self.db.delitem (query)
 		elif action == 'import':
 			self.imp (query)
-		elif action == 'get':
-			self.get (query)
+		elif action in ('get', 'copy'):
+			self.get (query, action == 'copy')
 		elif action == 'edit':
 			self.edit (query)
 		elif action == 'pwgen':
@@ -44,11 +44,20 @@ class Commands ():
 				self.db.additem (**line)
 
 
-	def get (self, query):
-		headings = [['ID','Title','Password','Details']]
+	def get (self, query, copy = False):
 		items = sorted (self.db.finditems (query, True), key=lambda x:x[0])
-		headings.extend (items)
-		util.print_table (headings, True)
+		if not items:
+			print ('No results to query `%s`.' % query)
+			return
+
+		if copy:
+			proc = subprocess.Popen (["xsel", "-bi"],
+				stdin = subprocess.PIPE)
+			proc.communicate (input = items [0] [2].encode ("utf8"))
+		else:
+			headings = [['ID','Title','Password','Details']]
+			headings.extend (items)
+			util.print_table (headings, True)
 
 
 	def edit (self, query):
