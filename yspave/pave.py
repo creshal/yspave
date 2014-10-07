@@ -1,15 +1,11 @@
 import os.path,xdg.BaseDirectory,json,Crypto.Random
 from . import pwgen
 
-appname = 'yspave'
-appvers = '0.0.4'
+from .metadata import appname, appvers, database_version, database_encoding
 
 default_dir = xdg.BaseDirectory.save_config_path(appname)
 db_filename = os.path.join (default_dir, 'default.db')
 config_filename = os.path.join (default_dir, 'config.json')
-
-database_version = 3
-database_encoding = 'utf8'
 
 class PaveCfg ():
 	complex_meta = 0.01
