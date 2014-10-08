@@ -61,3 +61,5 @@ class PaveCfg ():
 			if self.pwgen_mode == 'external' and 'call' in pwcfg:
 				self.pwgen_call = pwcfg['call']
 
+		if 'copy_call' in cfgsettings:
+			self.copy_call = cfgsettings ['copy_call']
