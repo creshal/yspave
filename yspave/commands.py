@@ -14,8 +14,10 @@ class Commands ():
 			self.db.delitem (query)
 		elif action == 'import':
 			self.imp (query)
-		elif action in ('get', 'copy'):
-			self.get (query, action == 'copy')
+		elif action == 'get':
+			self.get (query)
+		elif action == 'copy':
+			self.copy (query)
 		elif action == 'edit':
 			self.edit (query)
 		elif action == 'pwgen':
@@ -44,20 +46,50 @@ class Commands ():
 				self.db.additem (**line)
 
 
-	def get (self, query, copy = False):
+	def get (self, query):
+		headings = [['ID','Title','Password','Details']]
+		items = sorted (self.db.finditems (query, True), key=lambda x:x[0])
+		headings.extend (items)
+		util.print_table (headings, True)
+
+
+	def copy (self, query):
+		if not hasattr (self.db.cfg, 'copy_call'):
+			print ('Please set the toplevel attribute '
+				'`copy_call` in your config.json. '
+				'See the example config for details.')
+			return
+
 		items = sorted (self.db.finditems (query, True), key=lambda x:x[0])
 		if not items:
 			print ('No results for query `%s`.' % query)
 			return
 
-		if copy:
-			proc = subprocess.Popen (["xsel", "-bi"],
-				stdin = subprocess.PIPE)
-			proc.communicate (input = items [0] [2].encode ("utf8"))
-		else:
-			headings = [['ID','Title','Password','Details']]
-			headings.extend (items)
+		if len (items) > 1:
+			headings = [['ID', 'Title', 'Details']]
+			headings.extend ((i[:2] + (i[3],) for i in items))
 			util.print_table (headings, True)
+
+			idchoice = util.prompt (
+			        'Enter ID of the item you want to copy: '
+			)
+
+			chosen = None
+			for i in items:
+				if i[0] == idchoice:
+					chosen = i
+					break
+			else:
+				print ('Couldn\'t find ID `%s` in the '
+				        'items that matched your '
+				        'query.'%idchoice)
+				return
+		else:
+			chosen = items[0]
+
+		proc = subprocess.Popen (self.db.cfg.copy_call.split (),
+		                         stdin = subprocess.PIPE)
+		proc.communicate (input = chosen[2].encode ("utf8"))
 
 
 	def edit (self, query):

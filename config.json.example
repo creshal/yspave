@@ -1,5 +1,8 @@
 # vim:set ft=yaml:
 {
+  # When using the copy argument this is expected to be a command that reads a
+  # password from stdin and puts it into a X selection
+  "copy_call": "xsel -pi",
   "pwgen": {
     # built-in modes:
     # xkcd	Random word generator as per XKCD 936
