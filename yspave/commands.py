@@ -49,47 +49,39 @@ class Commands ():
 	def get (self, query):
 		headings = [['ID','Title','Password','Details']]
 		items = sorted (self.db.finditems (query, True), key=lambda x:x[0])
+		if not items: return
 		headings.extend (items)
 		util.print_table (headings, True)
 
 
 	def copy (self, query):
-		if not hasattr (self.db.cfg, 'copy_call'):
-			print ('Please set the toplevel attribute '
-				'`copy_call` in your config.json. '
-				'See the example config for details.')
-			return
+		cmd = self.db.cfg.copy_call if hasattr (self.db.cfg, 'copy_call') else 'xsel -pi'
 
 		items = sorted (self.db.finditems (query, True), key=lambda x:x[0])
-		if not items:
-			print ('No results for query `%s`.' % query)
-			return
+		if not items: return
 
-		if len (items) > 1:
+		if len (items) == 1:
+			chosen = items[0]
+		else:
 			headings = [['ID', 'Title', 'Details']]
 			headings.extend ((i[:2] + (i[3],) for i in items))
 			util.print_table (headings, True)
 
-			idchoice = util.prompt (
-			        'Enter ID of the item you want to copy: '
-			)
-
 			chosen = None
-			for i in items:
-				if i[0] == idchoice:
-					chosen = i
-					break
-			else:
-				print ('Couldn\'t find ID `%s` in the '
-				        'items that matched your '
-				        'query.'%idchoice)
-				return
-		else:
-			chosen = items[0]
+			while chosen == None:
+				idchoice = util.prompt ('Enter ID of the item you want to copy:\n> ')
+				for i in items:
+					if i[0] == idchoice:
+						chosen = i
+						break
+				else:
+					print ('ID not found.')
 
-		proc = subprocess.Popen (self.db.cfg.copy_call.split (),
-		                         stdin = subprocess.PIPE)
-		proc.communicate (input = chosen[2].encode ("utf8"))
+		try:
+			proc = subprocess.Popen (cmd.split(), stdin = subprocess.PIPE)
+			proc.communicate (input = chosen[2].encode ("utf8"))
+		except FileNotFoundError:
+			print ('Configured copy_call `%s` does not exist'%cmd)
 
 
 	def edit (self, query):
