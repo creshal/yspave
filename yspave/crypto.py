@@ -45,7 +45,7 @@ class PaveDB ():
 
 
 	def syncdb (self):
-		umask = False if os.path.exists (self.dbfile) else os.umask (0o7077)
+		umask = os.umask (0o7077)
 		if self.db['version'] < 3:
 			#re-encode old hex data as base64
 			for key in self.db['keys']:
@@ -63,7 +63,7 @@ class PaveDB ():
 			shutil.copyfile (self.dbfile,self.dbfile+'~')
 		with open (self.dbfile,'w') as f:
 			f.write (data)
-		if umask: os.umask (umask)
+		os.umask (umask)
 
 
 	def delitem (self, key):

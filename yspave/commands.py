@@ -1,6 +1,6 @@
 from . import pwgen, util
 from colorama import Fore as fg
-import getpass, readline, csv
+import getpass, readline, csv, subprocess
 
 class Commands ():
 	def __init__ (self, config, db):
@@ -8,7 +8,7 @@ class Commands ():
 		self.db  = db
 
 	def dispatch (self, action, query):
-		if action in ['new','add']:
+		if action in ('new','add'):
 			self.add (query, action == 'new')
 		elif action == 'del':
 			self.db.delitem (query)
@@ -16,6 +16,8 @@ class Commands ():
 			self.imp (query)
 		elif action == 'get':
 			self.get (query)
+		elif action == 'copy':
+			self.copy (query)
 		elif action == 'edit':
 			self.edit (query)
 		elif action == 'pwgen':
@@ -49,6 +51,45 @@ class Commands ():
 		items = sorted (self.db.finditems (query, True), key=lambda x:x[0])
 		headings.extend (items)
 		util.print_table (headings, True)
+
+
+	def copy (self, query):
+		if not hasattr (self.db.cfg, 'copy_call'):
+			print ('Please set the toplevel attribute '
+				'`copy_call` in your config.json. '
+				'See the example config for details.')
+			return
+
+		items = sorted (self.db.finditems (query, True), key=lambda x:x[0])
+		if not items:
+			print ('No results for query `%s`.' % query)
+			return
+
+		if len (items) > 1:
+			headings = [['ID', 'Title', 'Details']]
+			headings.extend ((i[:2] + (i[3],) for i in items))
+			util.print_table (headings, True)
+
+			idchoice = util.prompt (
+			        'Enter ID of the item you want to copy: '
+			)
+
+			chosen = None
+			for i in items:
+				if i[0] == idchoice:
+					chosen = i
+					break
+			else:
+				print ('Couldn\'t find ID `%s` in the '
+				        'items that matched your '
+				        'query.'%idchoice)
+				return
+		else:
+			chosen = items[0]
+
+		proc = subprocess.Popen (self.db.cfg.copy_call.split (),
+		                         stdin = subprocess.PIPE)
+		proc.communicate (input = chosen[2].encode ("utf8"))
 
 
 	def edit (self, query):
