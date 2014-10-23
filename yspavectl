@@ -14,8 +14,8 @@ Actions:
 	del	Deletes entry with supplied query ID
 	get	Searches the DB for the supplied query string
 		Shows the whole database if no query is supplied. This can take a while.
-	copy    Same as 'get' but copies the first result to the X CLIPBOARD
-		selection.
+	copy	Same as 'get', uses `copy_command` on (selectable) query result.
+		Default: Calls xsel to copy the result to primary selection.
 	pwgen	Generate a random password with supplied entropy and print it
 		(default: %i bit)
 	import	Imports passwords from a CSV file.
