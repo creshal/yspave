@@ -87,7 +87,12 @@ class Commands ():
 	def edit (self, query):
 		print ('Leave fields blank if you do not want to change them.')
 
-		entry = self.db.getitem (query)
+		try:
+			entry = self.db.getitem (query)
+		except KeyError:
+			print ('ID not found.')
+			return
+
 		nt = util.prompt ('Title: %s\nNew: '      %entry['Title'],   entry['Title'])
 		nd = util.prompt ('Description: %s\nNew: '%entry['Details'], entry['Details'])
 
