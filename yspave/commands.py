@@ -1,6 +1,6 @@
 from . import pwgen, util
 from colorama import Fore as fg
-import getpass, readline, csv, subprocess
+import getpass, readline, csv, subprocess,errno
 
 class Commands ():
 	def __init__ (self, config, db):
@@ -80,7 +80,10 @@ class Commands ():
 		try:
 			proc = subprocess.Popen (cmd.split(), stdin = subprocess.PIPE)
 			proc.communicate (input = chosen[2].encode ("utf8"))
-		except FileNotFoundError:
+		except OSError as e: #python2
+			if e.errno == errno.ENOENT:
+				print ('Configured copy_call `%s` does not exist'%cmd)
+		except subprocess.FileNotFoundError: #python3
 			print ('Configured copy_call `%s` does not exist'%cmd)
 
 
