@@ -71,15 +71,17 @@ class Commands ():
 
 
 	def edit (self, query):
-		print ('Leave fields blank if you do not want to change them.')
-
-		entry = util.pick (self.db, query)
+		eid = util.pick (self.db, query)[0]
+		entry = self.db.getitem (eid)
 		if not entry: return
 
-		nt = util.prompt ('Title: %s\nNew: '      %entry['Title'],   entry['Title'])
-		nd = util.prompt ('Description: %s\nNew: '%entry['Details'], entry['Details'])
+		print ('Leave fields blank if you do not want to change them.')
+		nt=util.prompt ((fg.CYAN+'Title:'+fg.YELLOW+' %s\n'+fg.RESET+'New: ')\
+		                  % entry['Title'],   entry['Title'])
+		nd=util.prompt ((fg.CYAN+'Description:'+fg.YELLOW+' %s\n'+fg.RESET+'New: ')\
+		                  % entry['Details'], entry['Details'])
 
-		pwchoice = util.prompt ('Change password? [(y)es/(N)o/(g)enerate]').lower()
+		pwchoice = util.prompt ('Change password? [(y)es/(N)o/(g)enerate] ').lower()
 		if pwchoice == 'y':
 			print ('Old password: %s'%self.db.dec (entry['Password'],self.db.key))
 			np = getpass.getpass ('New: ')
@@ -90,5 +92,5 @@ class Commands ():
 		else:
 			np = self.db.dec (entry['Password'],self.db.key)
 
-		self.db.edititem (query, nt, np, nd)
+		self.db.edititem (eid, nt, np, nd)
 
