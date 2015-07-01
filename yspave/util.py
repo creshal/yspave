@@ -1,7 +1,7 @@
 from __future__ import print_function
 from . import pave
 from colorama import Fore as fg
-import sys, scrypt, binascii, colorama, base64
+import sys, scrypt, binascii, colorama, base64, readline
 PY2 = sys.version_info < (3, 0, 0, 'final', 0)
 
 def print_table (ls,pretty=False):
@@ -27,3 +27,4 @@ def fromhex (data):      return binascii.unhexlify (data)
 
 def to64 (data):         return base64.b64encode(data).decode('ascii')
 def from64 (data):       return base64.b64decode(data)
+

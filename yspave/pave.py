@@ -51,7 +51,7 @@ class PaveCfg ():
 			if self.pwgen_mode not in pwgen.modes:
 				raise ValueError ('Unknown password generation mode: '+self.pwgen_mode)
 			if 'bits' in pwcfg: self.pwgen_bits = int(pwcfg['bits'])
-			if 'dict' in pwcfg: self.pwgen_dict = pwcfg['dict']
+			if 'dict' in pwcfg: self.pwgen_dict =     pwcfg['dict']
 			if not os.path.exists (self.pwgen_dict):
 				raise IOError ('Dictionary %s does not exist!' % self.pwgen_dict)
 			if self.pwgen_mode == 'external' and 'call' in pwcfg:
@@ -59,3 +59,4 @@ class PaveCfg ():
 
 		if 'copy_call' in cfgsettings:
 			self.copy_call = cfgsettings ['copy_call']
+
