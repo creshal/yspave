@@ -58,7 +58,9 @@ class Commands ():
 		cmd = self.db.cfg.copy_call if hasattr (self.db.cfg, 'copy_call') else 'xsel -pi'
 
 		items = sorted (self.db.finditems (query, True), key=lambda x:x[0])
-		if not items: return
+		if not items:
+			print ('No matches found!')
+			return
 
 		if len (items) == 1:
 			chosen = items[0]
