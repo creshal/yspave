@@ -99,5 +99,8 @@ else:
 		if action in ['help','?']:
 			print (actions+examples)
 		else:
-			cmd.dispatch (action, query)
+			try:
+				cmd.dispatch (action, query)
+			except (Exception,KeyboardInterrupt) as e:
+				print (fg.YELLOW+str(e))
 
