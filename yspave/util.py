@@ -12,6 +12,7 @@ def print_table (ls,pretty=False):
 		print(''.join([str(l[i]).ljust(csz[i]+4)for i in range(c)]).rstrip()+fg.RESET)
 
 def prompt (ps1='', default=''):
+	if default: readline.add_history (default)
 	i = raw_input(ps1) if PY2 else input (ps1)
 	return i if i else default
 
@@ -41,10 +42,10 @@ def pick (db, query):
 
 	headings = [['ID', 'Title', 'Details']]
 	headings.extend ((i[:2] + (i[3],) for i in items))
-	util.print_table (headings, True)
+	print_table (headings, True)
 
 	while True:
-		idchoice = util.prompt ('Enter ID of the item you want to copy:\n> ')
+		idchoice = prompt ('Enter an item ID:\n> ')
 		for i in items:
 			if i[0] == idchoice:
 				return i
