@@ -1,63 +1,18 @@
 #! /usr/bin/env python
 # (c) Samuel Vincent Creshal <samuel@creshal.de> 2014
 import argparse,getpass,sys, readline, os
-from yspave import pave, crypto, util, pwgen, commands
+from yspave import pave, crypto, util, pwgen, commands, metadata
 from colorama import Fore as fg
 
-actions = '''scrypt based password manager.
+actions = metadata.actions % (pave.PaveCfg.pwgen_bits,pave.PaveCfg.pwgen_bits)
 
-Actions:
-	new	Prompts for title/description and generates a new password
-		with supplied entropy (default: %i bit)
-	add	Prompts for title, description and password
-	edit	Edits entry with supplied query ID
-	del	Deletes entry with supplied query ID
-	get	Searches the DB for the supplied query string
-		Shows the whole database if no query is supplied. This can take a while.
-	copy	Same as 'get', uses `copy_command` on (selectable) query result.
-		Default: Calls xsel to copy the result to primary selection.
-	pwgen	Generate a random password with supplied entropy and print it
-		(default: %i bit)
-	import	Imports passwords from a CSV file.
-		Column order is title, description, password
-		The format is the default Excel/Calc format (comma separation,
-		quoting optional).
-	migrate	Re-syncs the database, migrating it to new database formats
-		and doing other maintenance if necessary.
-		This is also done automatically on all writing operations (edit/add/del).
-
-Password generator options:
-	x, xkcd		Random word generator as per XKCD 936
-	a, alnum	Random letters/numbers
-	p, print	Random characters (letters, digits, punctuation)
-
-'''%(pave.PaveCfg.pwgen_bits,pave.PaveCfg.pwgen_bits)
-examples = '''Examples:
-	yspavectl pwgen 192
-		Generates a random alphanumeric password and prints it
-
-	yspavectl -m x pwgen
-		Generates a random "sentence"
-
-	yspavectl get foobar
-		Shows all passwords matching "foobar" in their
-		description or title
-
-	yspavectl new
-		Generates a new password and saves it together with
-		supplied metadata
-
-	yspavectl edit 3
-		Edit the password with ID #3
-'''
-
-parser = argparse.ArgumentParser(prog=pave.appname,description=actions,formatter_class=argparse.RawTextHelpFormatter,epilog=examples)
+parser = argparse.ArgumentParser (prog=metadata.appname, description=actions,formatter_class=argparse.RawTextHelpFormatter, epilog=metadata.examples)
 parser.add_argument('--version', '-v', action='version', version='%(prog)s '+pave.appvers)
 parser.add_argument('--file','-f', help='Database file',nargs='?',default=pave.db_filename)
 parser.add_argument('--config-file','-c',help='Configuration file',nargs='?',default=pave.config_filename)
 parser.add_argument('--pwgen-mode','-m',choices=['print','p','alnum','a','xkcd','x'],nargs='?')
 parser.add_argument('action', choices=['migrate','new','add','edit','del','get','copy','pwgen','import'], default=None,nargs='?')
-parser.add_argument('query',default=None,nargs='?',help='ID for edit/del mode, search string for get mode')
+parser.add_argument('query',default=None,nargs='?',help='Search string')
 args = parser.parse_args()
 
 if os.path.exists (args.config_file):
