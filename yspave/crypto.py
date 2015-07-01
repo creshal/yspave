@@ -47,7 +47,7 @@ class PaveDB ():
 	def syncdb (self):
 		umask = os.umask (0o7077)
 		if self.db['version'] < 3:
-			#re-encode old hex data as base64
+			print ("Migrating database to new version...")
 			for key in self.db['keys']:
 				for prop in self.db['keys'][key]:
 					self.db['keys'][key][prop]=to64(fromhex(self.db['keys'][key][prop]))
