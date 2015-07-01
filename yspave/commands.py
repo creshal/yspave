@@ -29,11 +29,12 @@ class Commands ():
 
 
 	def add (self, entropy, generate=True):
-		title, desc = util.prompt ('Title: '), util.prompt ('Description: ')
+		title = util.prompt (fg.CYAN+'Title: '+fg.RESET)
+		desc  = util.prompt (fg.CYAN+'Description: '+fg.RESET)
 
 		if generate:
 			pw = self.gen.mkpass (entropy)
-			print ('Generated password: '+fg.YELLOW+pw+fg.RESET)
+			print (fg.CYAN+'Generated password: '+fg.YELLOW+pw+fg.RESET)
 		else: pw = getpass.getpass()
 
 		self.db.additem (title, pw, desc)
@@ -56,28 +57,8 @@ class Commands ():
 
 	def copy (self, query):
 		cmd = self.db.cfg.copy_call if hasattr (self.db.cfg, 'copy_call') else 'xsel -pi'
-
-		items = sorted (self.db.finditems (query, True), key=lambda x:x[0])
-		if not items:
-			print ('No matches found!')
-			return
-
-		if len (items) == 1:
-			chosen = items[0]
-		else:
-			headings = [['ID', 'Title', 'Details']]
-			headings.extend ((i[:2] + (i[3],) for i in items))
-			util.print_table (headings, True)
-
-			chosen = None
-			while chosen == None:
-				idchoice = util.prompt ('Enter ID of the item you want to copy:\n> ')
-				for i in items:
-					if i[0] == idchoice:
-						chosen = i
-						break
-				else:
-					print ('ID not found.')
+		chosen = util.pick (self.db, query)
+		if not chosen: return
 
 		try:
 			proc = subprocess.Popen (cmd.split(), stdin = subprocess.PIPE)
@@ -92,20 +73,18 @@ class Commands ():
 	def edit (self, query):
 		print ('Leave fields blank if you do not want to change them.')
 
-		try:
-			entry = self.db.getitem (query)
-		except KeyError:
-			print ('ID not found.')
-			return
+		entry = util.pick (self.db, query)
+		if not entry: return
 
 		nt = util.prompt ('Title: %s\nNew: '      %entry['Title'],   entry['Title'])
 		nd = util.prompt ('Description: %s\nNew: '%entry['Details'], entry['Details'])
 
 		pwchoice = util.prompt ('Change password? [(y)es/(N)o/(g)enerate]').lower()
 		if pwchoice == 'y':
-			print ('Password: %s'%self.db.dec (entry['Password'],self.db.key))
+			print ('Old password: %s'%self.db.dec (entry['Password'],self.db.key))
 			np = getpass.getpass ('New: ')
 		elif pwchoice == 'g':
+			print ('Old password: %s'%self.db.dec (entry['Password'],self.db.key))
 			np = self.gen.mkpass ()
 			print ('Generated password: '+fg.YELLOW+np+fg.RESET)
 		else:

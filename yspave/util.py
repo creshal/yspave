@@ -28,3 +28,25 @@ def fromhex (data):      return binascii.unhexlify (data)
 def to64 (data):         return base64.b64encode(data).decode('ascii')
 def from64 (data):       return base64.b64decode(data)
 
+
+def pick (db, query):
+	items = sorted (db.finditems (query, True), key=lambda x:x[0])
+
+	if not items:
+		print (fg.RED+'No matches found!'+fg.RESET)
+		return None
+
+	if len (items) == 1:
+		return items[0]
+
+	headings = [['ID', 'Title', 'Details']]
+	headings.extend ((i[:2] + (i[3],) for i in items))
+	util.print_table (headings, True)
+
+	while True:
+		idchoice = util.prompt ('Enter ID of the item you want to copy:\n> ')
+		for i in items:
+			if i[0] == idchoice:
+				return i
+		print (fg.RED+'ID not found.'+fg.RESET)
+
