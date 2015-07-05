@@ -1,3 +1,4 @@
+# vim: set tabstop=8 colorcolumn=80:
 appname = 'yspave'
 appvers = '0.0.10'
 
@@ -13,7 +14,8 @@ Actions:
 	edit	Edits an entry matching the query string
 	del	Deletes the entry with the supplied ID
 	get	Searches the DB for the supplied query string
-		Shows the whole database if no query is supplied. This can take a while.
+		Shows the whole database if no query is supplied, this can
+		take a while.
 	copy	Same as 'get', uses `copy_command` on (selectable) query result.
 		Default: Calls xsel to copy the result to primary selection.
 	pwgen	Generate a random password with supplied entropy and print it
@@ -24,7 +26,8 @@ Actions:
 		quoting optional).
 	migrate	Re-syncs the database, migrating it to new database formats
 		and doing other maintenance if necessary.
-		This is also done automatically on all writing operations (edit/add/del).
+		This is also done automatically on all writing operations
+		(i.e., add/del/edit/new/import).
 
 Password generator options:
 	x, xkcd		Random word generator as per XKCD 936
