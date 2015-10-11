@@ -52,7 +52,7 @@ else:
 		except KeyboardInterrupt: sys.exit (1)
 
 		if action in ['help','?']:
-			print (actions+examples)
+			print (actions+metadata.examples)
 		else:
 			try:
 				cmd.dispatch (action, query)
