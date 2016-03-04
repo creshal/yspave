@@ -57,5 +57,7 @@ else:
 			try:
 				cmd.dispatch (action, query)
 			except (Exception,KeyboardInterrupt) as e:
-				print (fg.YELLOW+str(e))
+				import traceback
+				traceback.print_exc()
+				print (fg.YELLOW+str(e)+fg.RESET)
 

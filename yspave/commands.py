@@ -56,9 +56,13 @@ class Commands ():
 
 
 	def copy (self, query):
-		cmd = self.db.cfg.copy_call if hasattr (self.db.cfg, 'copy_call') else 'xsel -pi'
+		cmd = self.db.cfg.copy_call
 		chosen = util.pick (self.db, query)
 		if not chosen: return
+
+		if self.db.cfg.copy_show_details:
+			print (fg.CYAN+'Title: '+fg.YELLOW+chosen[1]+fg.RESET)
+			print (fg.CYAN+'Details: '+fg.YELLOW+chosen[3]+fg.RESET)
 
 		try:
 			proc = subprocess.Popen (cmd.split(), stdin = subprocess.PIPE)
@@ -71,8 +75,10 @@ class Commands ():
 
 
 	def edit (self, query):
-		eid = util.pick (self.db, query)[0]
-		entry = self.db.getitem (eid)
+		eid = util.pick (self.db, query)
+		if not eid: return
+
+		entry = self.db.getitem (eid[0])
 		if not entry: return
 
 		print ('Leave fields blank if you do not want to change them.')

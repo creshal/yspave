@@ -10,13 +10,16 @@ config_filename = os.path.join (default_dir, 'config.json')
 class PaveCfg ():
 	complex_meta = 0.01
 	complex_pass = 1.0
-	mem_factor = 64*1024*1024
+	mem_factor = 512*1024*1024
 	saltsize = 32
 
 	pwgen_mode = 'print'
 	pwgen_call = None
 	pwgen_bits = 64
 	pwgen_dict = '/usr/share/dict/words'
+
+	copy_call = 'xsel -pi'
+	copy_show_details = False
 
 	def __init__ (self, filename, override_mode=None):
 		self.rng = Crypto.Random.new()
@@ -58,5 +61,14 @@ class PaveCfg ():
 				self.pwgen_call = pwcfg['call']
 
 		if 'copy_call' in cfgsettings:
+			print ('Warning: The copy_call setting is obsolete and will be removed '
+			 'in a later release. Change your settings to use "copy": { "call":"" } '
+			 'instead (cf. example settings file).')
 			self.copy_call = cfgsettings ['copy_call']
+
+		if 'copy' in cfgsettings:
+			cpcfg = cfgsettings['copy']
+			if 'call' in cpcfg: self.copy_call = cpcfg ['call']
+			if 'show_details' in cpcfg:
+				self.copy_show_details = cpcfg ['show_details']
 

@@ -1,8 +1,15 @@
-# vim:set ft=yaml:
+# vim:set ft=yaml expandtabs=true:
 {
-  # When using the copy argument this is expected to be a command that reads a
-  # password from stdin and puts it into a X selection
-  "copy_call": "xsel -pi",
+  "copy": {
+    # When using the copy argument this is expected to be a command that reads
+    # a password from stdin and puts it into a X selection
+    "call": "xsel -pi",
+    # By default, "copy" does not give any visible output to identify the entry
+    # selected. This is considered safer, but means you do not get the details
+    # which might e.g. contain user names. By enabling this, title and details
+    # of a copied password will be printed on stdout.
+    "show_details": false
+  },
   "pwgen": {
     # built-in modes:
     # xkcd	Random word generator as per XKCD 936
@@ -42,7 +49,7 @@
     #"memory_factor": 655360, #640k ought to be enough for everybody, or not
     #"memory_factor": 1G,
     #"memory_factor": 4000K,
-    "memory_factor": "64M",
+    "memory_factor": "512M",
     # This is the salt length (in byte) for the password-derived keys. Will
     # only affect newly created databases. As this has neglibile impact on
     # performance, it can be left at the default.
