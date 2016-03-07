@@ -1,4 +1,5 @@
 import os.path,xdg.BaseDirectory,json,Crypto.Random
+from colorama import Fore as fg
 from . import pwgen
 
 from .metadata import appname, appvers, database_version, database_encoding
@@ -28,8 +29,15 @@ class PaveCfg ():
 		if not filename: return
 
 		with open (filename) as f:
-			cfgsettings=json.loads(''.join(filter(lambda x:x.strip()[0]!='#',
-			                       f.readlines())))
+			try:
+				cfgsettings=json.loads(
+				              ''.join(filter(lambda x:x.strip()[0]!='#',
+				                      f.readlines()))
+				)
+			except json.decoder.JSONDecodeError:
+				print (fg.YELLOW+"Could not parse config file!"+fg.RESET)
+				sys.exit (2)
+
 		if 'encryption' in cfgsettings:
 			encfg = cfgsettings['encryption']
 			if 'metadata_complexity' in encfg: self.complex_meta = float(encfg['metadata_complexity'])

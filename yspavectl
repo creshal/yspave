@@ -6,7 +6,7 @@ from colorama import Fore as fg
 
 actions = metadata.actions % (pave.PaveCfg.pwgen_bits,pave.PaveCfg.pwgen_bits)
 
-parser = argparse.ArgumentParser (prog=metadata.appname, description=actions,formatter_class=argparse.RawTextHelpFormatter, epilog=metadata.examples)
+parser = argparse.ArgumentParser (prog=metadata.appname+'ctl', description=actions,formatter_class=argparse.RawTextHelpFormatter, epilog=metadata.examples)
 parser.add_argument('--version', '-v', action='version', version='%(prog)s '+pave.appvers)
 parser.add_argument('--file','-f', help='Database file',nargs='?',default=pave.db_filename)
 parser.add_argument('--config-file','-c',help='Configuration file',nargs='?',default=pave.config_filename)
