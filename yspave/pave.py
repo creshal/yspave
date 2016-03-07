@@ -35,7 +35,9 @@ class PaveCfg ():
 				                      f.readlines()))
 				)
 			except json.decoder.JSONDecodeError:
-				print (fg.YELLOW+"Could not parse config file!"+fg.RESET)
+				print (fg.YELLOW+"Could not parse config file:"+fg.RESET)
+				import traceback
+				traceback.print_exc()
 				sys.exit (2)
 
 		if 'encryption' in cfgsettings:
