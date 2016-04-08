@@ -1,4 +1,4 @@
-from . import pwgen, util
+from . import pwgen, util, metadata
 from colorama import Fore as fg
 import getpass, readline, csv, subprocess,errno
 
@@ -8,27 +8,19 @@ class Commands ():
 		self.db  = db
 
 	def dispatch (self, action, query):
-		if action in ('new','add'):
-			self.add (query, action == 'new')
-		elif action == 'del':
-			self.db.delitem (query)
-		elif action == 'import':
-			self.imp (query)
-		elif action == 'get':
-			self.get (query)
-		elif action == 'copy':
-			self.copy (query)
-		elif action == 'edit':
-			self.edit (query)
-		elif action == 'pwgen':
-			print (self.gen.mkpass (query))
+		if action in metadata.verbs:
+			if action == 'import': action = 'imp' #reserved keyword
+			elif action == 'del':  action = 'dele'
+			getattr (self, action)(query)
+		else:
+			print (fg.RED+'Unknown action!'+fg.RESET)
 
-		#action == migrate is handled implicitly by this
-		if action not in ['get','pwgen']:
-			self.db.syncdb()
+		# Sync after writing actions; this also implicitly migrates
+		if action not in ['pwgen', 'get', 'list']:
+			self.db.syncdb ()
 
 
-	def add (self, entropy, generate=True):
+	def add (self, entropy, generate=False):
 		title = util.prompt (fg.CYAN+'Title: '+fg.RESET)
 		desc  = util.prompt (fg.CYAN+'Description: '+fg.RESET)
 
@@ -40,6 +32,12 @@ class Commands ():
 		self.db.additem (title, pw, desc)
 
 
+	def new (self, entropy): self.add (entropy, True)
+	def dele (self, query):  self.db.delitem (query)
+	def migrate (self, arg): pass #Already done in dispatch()
+	def pwgen (self, query): print (self.gen.mkpass (query))
+
+
 	def imp (self, source):
 		with open (source, newline='') as f:
 			r = csv.DictReader (f, fieldnames=('title','details','password'))
@@ -47,12 +45,16 @@ class Commands ():
 				self.db.additem (**line)
 
 
-	def get (self, query):
+	def get (self, query, decrypt=True):
 		headings = [['ID','Title','Password','Details']]
-		items = sorted (self.db.finditems (query, True), key=lambda x:x[0])
+		items = sorted (self.db.finditems (query, decrypt), key=lambda x:x[0])
 		if not items: return
 		headings.extend (items)
-		util.print_table (headings, True)
+		util.print_table (headings if decrypt else
+		                  [(x[0],x[1],x[3]) for x in headings], #prune pw column
+		                  True)
+
+	def list (self, query): self.get (query, False)
 
 
 	def copy (self, query):
@@ -70,6 +72,7 @@ class Commands ():
 		except OSError as e: #python2
 			if e.errno == errno.ENOENT:
 				print ('Configured copy_call `%s` does not exist'%cmd)
+			else: raise e #Unknown error, bail
 		except subprocess.FileNotFoundError: #python3
 			print ('Configured copy_call `%s` does not exist'%cmd)
 
