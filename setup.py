@@ -7,7 +7,8 @@ setup (
 	install_requires=['scrypt','pycrypto','colorama','pyxdg'],
 	data_files=[
 	 ('share/doc/yspave',['COPYING','HACKING.md','README.md','config.json.example']),
-	 ('bin',['yspavectl'])
+	 ('bin',['yspavectl']),
+	 ('share/zsh/site-functions',['_yspavectl']),
 	],
 	url='https://dev.yaki-syndicate.de/',
 	packages=['yspave'],
