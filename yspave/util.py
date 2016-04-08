@@ -45,7 +45,8 @@ def pick (db, query):
 	print_table (headings, True)
 
 	while True:
-		idchoice = prompt ('Enter an item ID:\n> ')
+		try:   idchoice = prompt ('Enter an item ID:\n> ')
+		except KeyboardInterrupt: return None
 		for i in items:
 			if i[0] == idchoice:
 				return i
