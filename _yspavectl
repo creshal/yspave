@@ -8,14 +8,14 @@ typeset -A opt_args
 local context state line
 
 _arguments -s -S \
-  "-h[show this help message and exit]:" \
-  "--help[show this help message and exit]:" \
+  "-h[show help and exit]:" \
+  "--help[show help and exit]:" \
   "-v[show program's version number and exit]:" \
   "--version[show program's version number and exit]:" \
   "-f[Database file]::[FILE]:_files" \
   "--file[Database file]::[FILE]:_files" \
   "-c[Configuration file]::[CONFIG_FILE]:_files" \
   "--config-file[Configuration file]::[CONFIG_FILE]:_files" \
-  "-m::[{print,p,alnum,a,xkcd,x}]:_files" \
-  "--pwgen-mode::[{print,p,alnum,a,xkcd,x}]:_files" \
+  "-m::[One of print,p,alnum,a,xkcd,x]:_files" \
+  "--pwgen-mode::[One of print,p,alnum,a,xkcd,x]:_files" \
   "*::args:_files"
