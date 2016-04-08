@@ -81,7 +81,7 @@ class PaveDB ():
 			'Password': self.enc (password,self.key,      self.cfg.complex_pass),
 			'Details':  self.enc (details, self.key_meta, self.cfg.complex_meta)
 		}
-		self.db['keys'][key] = value
+		self.db['keys'][str(key)] = value
 
 
 	def getitem (self, key):
