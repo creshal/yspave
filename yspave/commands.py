@@ -75,28 +75,24 @@ class Commands ():
 
 
 	def edit (self, query):
-		eid = util.pick (self.db, query)
-		if not eid: return
-
-		entry = self.db.getitem (eid[0])
+		entry = util.pick (self.db, query)
 		if not entry: return
+		eid, ot, pw, od = entry
 
 		print ('Leave fields blank if you do not want to change them.')
 		nt=util.prompt ((fg.CYAN+'Title:'+fg.YELLOW+' %s\n'+fg.RESET+'New: ')\
-		                  % entry['Title'],   entry['Title'])
+		                  % ot, ot)
 		nd=util.prompt ((fg.CYAN+'Description:'+fg.YELLOW+' %s\n'+fg.RESET+'New: ')\
-		                  % entry['Details'], entry['Details'])
+		                  % od, od)
 
 		pwchoice = util.prompt ('Change password? [(y)es/(N)o/(g)enerate] ').lower()
 		if pwchoice == 'y':
 			print ('Old password: %s'%self.db.dec (entry['Password'],self.db.key))
-			np = getpass.getpass ('New: ')
+			pw = getpass.getpass ('New: ')
 		elif pwchoice == 'g':
 			print ('Old password: %s'%self.db.dec (entry['Password'],self.db.key))
-			np = self.gen.mkpass ()
+			pw = self.gen.mkpass ()
 			print ('Generated password: '+fg.YELLOW+np+fg.RESET)
-		else:
-			np = self.db.dec (entry['Password'],self.db.key)
 
-		self.db.edititem (eid, nt, np, nd)
+		self.db.edititem (eid, nt, pw, nd)
 
