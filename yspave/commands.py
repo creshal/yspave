@@ -33,7 +33,6 @@ class Commands ():
 
 
 	def new (self, entropy): self.add (entropy, True)
-	def dele (self, query):  self.db.delitem (query)
 	def migrate (self, arg): pass #Already done in dispatch()
 	def pwgen (self, query): print (self.gen.mkpass (query))
 
@@ -55,6 +54,15 @@ class Commands ():
 		                  True)
 
 	def list (self, query): self.get (query, False)
+
+
+	def dele (self, query):
+		eid, title, pw, desc = util.pick (self.db, query)
+
+		if util.prompt (fg.RED+ 'Are you sure you want to delete this item? [yN] '\
+		                + fg.RESET).lower () == 'y':
+			self.db.delitem (eid)
+			print (fg.RED+'Deleted'+fg.RESET)
 
 
 	def copy (self, query):
