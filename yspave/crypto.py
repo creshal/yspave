@@ -98,7 +98,7 @@ class PaveDB ():
 		for key in self.db['keys']:
 			x=self.getitem (key)
 			# Empty query ==> print whole database
-			if not query or query in (x['Title'].upper()+x['Details'].upper()):
+			if not query or key == query or query in (x['Title'].upper()+x['Details'].upper()):
 				results.append ((
 				 key,
 				 x['Title'],
