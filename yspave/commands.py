@@ -98,10 +98,10 @@ class Commands ():
 
 		pwchoice = util.prompt ('Change password? [(y)es/(N)o/(g)enerate] ').lower()
 		if pwchoice == 'y':
-			print ('Old password: %s'%self.db.dec (pw,self.db.key))
+			print ('Old password: %s' % pw)
 			pw = getpass.getpass ('New: ')
 		elif pwchoice == 'g':
-			print ('Old password: %s'%self.db.dec (pw,self.db.key))
+			print ('Old password: %s' % pw)
 			pw = self.gen.mkpass ()
 			print ('Generated password: '+fg.YELLOW+np+fg.RESET)
 
