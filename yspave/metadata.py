@@ -1,6 +1,6 @@
 # vim: set tabstop=8 shiftwidth=8 colorcolumn=80:
 appname = 'yspave'
-appvers = '0.0.12'
+appvers = '0.1.1'
 
 database_version = 3
 database_encoding = 'utf8'
