@@ -48,8 +48,10 @@ Actions:
 
 Password generator options:
 	x, xkcd		Random word generator as per XKCD 936
-	a, alnum	Random letters/numbers
+	a, alnum	Random letters and digits
 	p, print	Random characters (letters, digits, punctuation)
+	n, numeric	Random digits
+	external	Call external password generator
 
 '''
 

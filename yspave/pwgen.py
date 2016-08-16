@@ -1,7 +1,7 @@
 import subprocess, math, string
 from Crypto.Random import random
 
-modes = ['external', 'x','xkcd','p','print', 'a','alnum']
+modes = ['external', 'x','xkcd','p','print', 'a','alnum', 'n','numeric']
 
 class PwGen ():
 	def __init__ (self, config):
@@ -28,6 +28,8 @@ class PwGen ():
 				lut = string.ascii_letters+string.digits+string.punctuation
 			elif self.mode in ['a','alnum']:
 				lut = string.ascii_letters+string.digits
+			elif self.mode in ['n','numeric']:
+				lut = string.digits
 			lutsz = len (lut)
 			bytes_needed = self.entropy_estimate (entropy, lutsz)
 			return ''.join (map (lambda x: lut[x%lutsz], bytearray(self.rng.read(bytes_needed))))
