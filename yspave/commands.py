@@ -103,7 +103,7 @@ class Commands ():
 		elif pwchoice == 'g':
 			print ('Old password: %s' % pw)
 			pw = self.gen.mkpass ()
-			print ('Generated password: '+fg.YELLOW+np+fg.RESET)
+			print ('Generated password: '+fg.YELLOW+pw+fg.RESET)
 
 		self.db.edititem (eid, nt, pw, nd)
 
